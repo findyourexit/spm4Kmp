@@ -449,7 +449,7 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
         for (modulePath in moduleMapPossiblePath) {
             val file = moduleConfig.buildDir.resolve(modulePath)
             if (file.exists()) {
-                logger.debug("modulemap found {}", path)
+                logger.debug("modulemap found {}", file)
                 return file.toFile()
             }
         }

@@ -4,6 +4,7 @@ import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.tasks.apple.generateCInteropDefinition.GenerateCInteropDefinitionTask
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
+import org.gradle.api.GradleException
 import java.io.File
 import java.nio.file.Path
 
@@ -63,7 +64,12 @@ internal fun getModulesInBuildDirectory(buildDir: File): List<File> =
         .listFiles { file ->
             val ext = file.extension
             ext == "build" || ext == "framework" || file.name == "Modules"
-        }?.toList() ?: throw RuntimeException("No Module/Framework found in ${buildDir.path}")
+        }?.toList() ?: throw GradleException(
+        "spmForKmp: no Swift module or framework was found in '${buildDir.path}'. " +
+            "This usually means the Swift package failed to compile for this target, or the " +
+            "scratch directory is stale — try a clean build. If the problem persists, please open " +
+            "an issue with your plugin configuration.",
+    )
 
 private val moduleNameRegex = """module\s+(\S+)\s+""".toRegex()
 
