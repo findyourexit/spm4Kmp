@@ -321,28 +321,15 @@ internal class TaskTracer(
             } else {
                 ""
             }
+        val escName = esc(span.name)
+        val pctStr = String.format(locale = Locale.US, "%.1f", pct)
+        val barStr = String.format(locale = Locale.US, "%.1f", barWidth)
         return """
-                                                                                                                                                                                    <li>
-                                                                                                                                                                                      <div><strong>${
-            esc(
-                span.name,
-            )
-        }</strong> — $ms ms <span class=\"pct\">(${
-            String.format(
-                locale = Locale.US,
-                "%.1f",
-                pct,
-            )
-        }%)</span></div>
-                                                                                                                                                                                      <div class=\"bar\" style=\"width:${
-            String.format(
-                locale = Locale.US,
-                "%.1f",
-                barWidth,
-            )
-        }%\"></div>
-                                                                                                                                                                                      $childrenHtml
-                                                                                                                                                                                    </li>
+            <li>
+              <div><strong>$escName</strong> — $ms ms <span class=\"pct\">($pctStr%)</span></div>
+              <div class=\"bar\" style=\"width:$barStr%\"></div>
+              $childrenHtml
+            </li>
             """.trimIndent()
     }
 

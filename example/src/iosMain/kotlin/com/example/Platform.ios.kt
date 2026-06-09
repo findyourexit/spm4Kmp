@@ -11,7 +11,6 @@ import nativeIosShared.MySwiftDummyClass
 import nativeIosShared.TestClass
 import platform.UIKit.UIDevice
 import platform.UIKit.UIView
-import registrydummy.RegistryDummy
 
 class IOSPlatform : Platform {
     fun getMyFrameworkResource(): String = MyDummyFramework().getMyResource()

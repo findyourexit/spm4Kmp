@@ -194,7 +194,7 @@ internal fun Project.configAppleTargets(
                         mainCompilation,
                         cinteropName,
                         extraOpts + swiftPackageEntry.extraOpts,
-                        file
+                        file,
                     )
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
