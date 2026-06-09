@@ -198,6 +198,29 @@ constructor(
             .get()
             .path
 
+    internal val bridgeResourceRulesList: MutableList<BridgeResourceRule> = mutableListOf()
+
+    /**
+     * Declares one or more SwiftPM resource rules for the bridge target.
+     *
+     * These rules are emitted into the `resources:` array of the generated bridge target in
+     * `Package.swift`. They complement the convention-based auto-discovery (folders named
+     * `Resources-process`, `Resources-copy`, `Resources-embed` inside the bridge source dir).
+     *
+     * Example:
+     * ```kotlin
+     * bridgeResourceRules(
+     *     BridgeResourceRule.Process("Resources"),
+     *     BridgeResourceRule.Copy("FixedLayout.json"),
+     * )
+     * ```
+     *
+     * @param rules One or more [BridgeResourceRule] entries.
+     */
+    public fun bridgeResourceRules(vararg rules: BridgeResourceRule) {
+        bridgeResourceRulesList.addAll(rules)
+    }
+
     internal var bridgeSettings: BridgeSettingsConfig = BridgeSettings()
 
     /**

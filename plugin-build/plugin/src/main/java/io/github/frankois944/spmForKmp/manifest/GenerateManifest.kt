@@ -2,6 +2,7 @@ package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.config.ModuleConfig
 import io.github.frankois944.spmForKmp.config.containsPackage
+import io.github.frankois944.spmForKmp.definition.BridgeResourceRule
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 
 @Suppress("LongMethod")
@@ -37,7 +38,7 @@ internal fun generateManifest(parameters: TemplateParameters): String {
             swiftBuildDir = parameters.generatedPackageDirectory,
             settings = parameters.targetSettings,
         ).takeIf { it.isNotEmpty() }
-    val getResourceSetting = getResourceSettings(parameters.resourcesPaths)
+    val getResourceSetting = getResourceSettings(parameters.resourcesPaths, parameters.bridgeResourceRules)
     val name = parameters.exportedPackage?.name ?: parameters.productName
     val type =
         parameters.exportedPackage?.isStatic?.let {
@@ -91,31 +92,27 @@ let package = Package(
         """
 }
 
-private fun getResourceSettings(paths: ResourcesPaths?): String? =
-    if (paths?.embedPath.isNullOrEmpty() &&
-        paths?.copiedPath.isNullOrEmpty() &&
-        paths?.processPath.isNullOrEmpty()
-    ) {
-        null
-    } else {
-        buildString {
-            append("resources: [")
-            val builtPaths =
-                buildList {
-                    paths.processPath?.let {
-                        add(".process(\"$it\")")
-                    }
-                    paths.copiedPath?.let {
-                        add(".copy(\"$it\")")
-                    }
-                    paths.embedPath?.let {
-                        add(".embedInCode(\"$it\")")
-                    }
-                }.joinToString(",")
-            append(builtPaths)
-            append("]")
+private fun getResourceSettings(
+    paths: ResourcesPaths?,
+    extraRules: List<BridgeResourceRule> = emptyList(),
+): String? {
+    val entries =
+        buildList {
+            // Auto-discovered convention folders
+            paths?.processPath?.let { add(".process(\"$it\")") }
+            paths?.copiedPath?.let { add(".copy(\"$it\")") }
+            paths?.embedPath?.let { add(".embedInCode(\"$it\")") }
+            // User-declared DSL rules
+            extraRules.forEach { rule ->
+                when (rule) {
+                    is BridgeResourceRule.Process -> add(".process(\"${rule.path}\")")
+                    is BridgeResourceRule.Copy -> add(".copy(\"${rule.path}\")")
+                    is BridgeResourceRule.EmbedInCode -> add(".embedInCode(\"${rule.path}\")")
+                }
+            }
         }
-    }
+    return if (entries.isEmpty()) null else "resources: [${entries.joinToString(",")}]"
+}
 
 private fun getPlatformBlock(
     minIos: String,

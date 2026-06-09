@@ -41,6 +41,7 @@ internal fun GenerateManifestTask.configureTask(
     this.swiftBinPath.set(swiftPackageEntry.swiftBinPath)
     this.traceEnabled.set(project.isTraceEnabled)
     this.resourcesPaths.set(buildResourcesPath(packageDirectoriesConfig))
+    this.bridgeResourceRules.set(swiftPackageEntry.bridgeResourceRulesList)
     this.storedTraceFile.set(
         project.projectDir
             .resolve(SPM_TRACE_NAME)

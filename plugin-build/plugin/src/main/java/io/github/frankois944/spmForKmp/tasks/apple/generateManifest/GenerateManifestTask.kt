@@ -1,5 +1,6 @@
 package io.github.frankois944.spmForKmp.tasks.apple.generateManifest
 
+import io.github.frankois944.spmForKmp.definition.BridgeResourceRule
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
 import io.github.frankois944.spmForKmp.definition.packageSetting.BridgeSettings
 import io.github.frankois944.spmForKmp.manifest.ResourcesPaths
@@ -27,6 +28,9 @@ internal abstract class GenerateManifestTask : DefaultTask() {
 
     @get:Input
     abstract val resourcesPaths: Property<ResourcesPaths>
+
+    @get:Input
+    abstract val bridgeResourceRules: ListProperty<BridgeResourceRule>
 
     @get:Input
     abstract val packageName: Property<String>
@@ -111,6 +115,7 @@ internal abstract class GenerateManifestTask : DefaultTask() {
                                 targetSettings = targetSettings.get(),
                                 exportedPackage = null,
                                 resourcesPaths = resourcesPaths.get(),
+                                bridgeResourceRules = bridgeResourceRules.get(),
                             ),
                     )
                 manifestFile.get().asFile.writeText(manifest)
