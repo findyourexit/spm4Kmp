@@ -1,17 +1,20 @@
 package io.github.frankois944.spmForKmp.manifest
 
 import io.github.frankois944.spmForKmp.definition.SwiftDependency
+import java.nio.file.Path
+import kotlin.io.path.relativeToOrSelf
 
 internal val SwiftDependency.isBinaryDependency: Boolean
     get() =
         (this is SwiftDependency.Binary.Local) ||
             (this is SwiftDependency.Binary.Remote)
 
-internal fun SwiftDependency.toDependencyDeclaration(): String? =
+internal fun SwiftDependency.toDependencyDeclaration(swiftBuildDir: Path): String? =
     when (this) {
         is SwiftDependency.Package.Local -> {
+            val relativePath = Path.of(path).relativeToOrSelf(swiftBuildDir)
             """
-            .package(path: "$path")
+            .package(path: "$relativePath")
             """.trimIndent()
         }
 

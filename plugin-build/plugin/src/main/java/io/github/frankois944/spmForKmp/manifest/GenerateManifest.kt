@@ -67,7 +67,7 @@ let package = Package(
     }])
     ],
     dependencies: [
-        ${getDependencies(parameters.dependencies, parameters.forExportedPackage, parameters.onlyDeps)}
+        ${getDependencies(parameters.dependencies, parameters.forExportedPackage, parameters.onlyDeps, parameters.generatedPackageDirectory)}
     ],
     targets: [
         .target(

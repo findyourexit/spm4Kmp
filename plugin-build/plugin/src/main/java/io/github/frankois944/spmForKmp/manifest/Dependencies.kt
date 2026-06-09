@@ -11,13 +11,14 @@ internal fun getDependencies(
     dependencies: List<SwiftDependency>,
     forExportedPackage: Boolean,
     onlyDeps: List<ModuleConfig>,
+    swiftBuildDir: Path,
 ): String =
     buildList {
         dependencies
             .filter { !it.isBinaryDependency }
             .forEach { dependency ->
                 if (!forExportedPackage || hasExportedDependencyProduct(dependency, onlyDeps)) {
-                    dependency.toDependencyDeclaration()?.let {
+                    dependency.toDependencyDeclaration(swiftBuildDir)?.let {
                         add(it)
                     }
                 }
