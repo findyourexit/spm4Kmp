@@ -222,6 +222,18 @@ constructor(
      */
     public var swiftBinPath: String? = null
 
+    /**
+     * Controls whether the Swift Package Manager build sandbox is disabled (`--disable-sandbox`).
+     *
+     * The plugin passes `--disable-sandbox` to `swift build` so SwiftPM can write into the
+     * plugin-managed scratch directory. However, some binary `.xcframework` dependencies fail to
+     * resolve with the sandbox disabled (see https://github.com/frankois944/spm4Kmp/issues/312).
+     * Set this to `false` to let SwiftPM run with its default sandbox.
+     *
+     * Default: `true` (preserves the existing behavior)
+     */
+    public var disableSandbox: Boolean = true
+
     internal var exportedPackageSettings: ExportedPackage = ExportedPackage()
 
     /**

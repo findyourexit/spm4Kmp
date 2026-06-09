@@ -90,6 +90,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
     @get:Optional
     abstract val toolchain: Property<String>
 
+    @get:Input
+    abstract val disableSandbox: Property<Boolean>
+
     @get:Inject
     abstract val execOps: ExecOperations
 
@@ -139,7 +142,9 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
                     add(cinteropTarget.get().triple(osVersion.orNull.orEmpty()))
                     add("--scratch-path")
                     add(packageScratchDir.get())
-                    add("--disable-sandbox")
+                    if (disableSandbox.get()) {
+                        add("--disable-sandbox")
+                    }
                     add("-c")
                     add(if (debugMode.get()) "debug" else "release")
                     add("--jobs")
