@@ -7,6 +7,7 @@ import io.github.frankois944.spmForKmp.fixture.KotlinSource
 import io.github.frankois944.spmForKmp.fixture.SmpKMPTestFixture
 import io.github.frankois944.spmForKmp.fixture.SwiftSource
 import io.github.frankois944.spmForKmp.utils.BaseTest
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 /**
@@ -57,6 +58,7 @@ class MultiTargetBinaryPackageTest : BaseTest() {
                     ),
                 ).build()
 
+        // When
         val result =
             GradleBuilder
                 .runner(fixture.gradleProject.rootDir, "build")
@@ -64,5 +66,25 @@ class MultiTargetBinaryPackageTest : BaseTest() {
 
         // Then
         assertThat(result).task(":library:build").succeeded()
+        // The single shared resolve task ran, and BOTH targets compiled against the resolved binary.
+        assertThat(result).task(":library:SwiftPackageConfigAppleDummyResolveSwiftPackage").succeeded()
+        assertThat(result).task(":library:SwiftPackageConfigAppleDummyCompileSwiftPackageIosArm64").succeeded()
+        assertThat(result)
+            .task(":library:SwiftPackageConfigAppleDummyCompileSwiftPackageIosSimulatorArm64")
+            .succeeded()
+
+        // The remote xcframework was extracted into the shared scratch `artifacts/` directory.
+        val scratch =
+            fixture.gradleProject.rootDir
+                .resolve("library/build/spmKmpPlugin/dummy/scratch")
+        val extractedXcframework =
+            scratch
+                .resolve("artifacts")
+                .walkTopDown()
+                .firstOrNull { it.name == "DummyFramework.xcframework" && it.isDirectory }
+        assertTrue(
+            extractedXcframework?.resolve("Info.plist")?.exists() == true,
+            "Expected the resolved DummyFramework.xcframework (with Info.plist) under $scratch/artifacts",
+        )
     }
 }
