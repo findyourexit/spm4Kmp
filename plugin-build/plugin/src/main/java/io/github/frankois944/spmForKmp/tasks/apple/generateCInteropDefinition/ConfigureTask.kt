@@ -32,6 +32,8 @@ internal fun GenerateCInteropDefinitionTask.configureTask(
     )
     this.manifestFile.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.scratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.resolvedArtifactsDir.from(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
+    this.resolvedCheckoutsDir.from(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
     this.packageDependencyPrefix.set(swiftPackageEntry.packageDependencyPrefix)
     this.compilerOpts.set(swiftPackageEntry.compilerOpts)
     this.linkerOpts.set(swiftPackageEntry.linkerOpts)

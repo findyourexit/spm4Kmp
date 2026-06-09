@@ -5,6 +5,7 @@ import io.github.frankois944.spmForKmp.operations.getSDKPath
 import io.github.frankois944.spmForKmp.operations.printExecLogs
 import io.github.frankois944.spmForKmp.tasks.utils.TaskTracer
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -13,6 +14,7 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectories
@@ -49,6 +51,20 @@ internal abstract class CompileSwiftPackageTask : DefaultTask() {
 
     @get:Input
     abstract val packageScratchDir: Property<String>
+
+    /**
+     * The shared SwiftPM resolution outputs produced by `ResolveSwiftPackageTask`. Declared as
+     * inputs so this target's build is re-run (and cannot get an unsound cache hit) when the
+     * resolved artifacts/checkouts change. Modeled as [ConfigurableFileCollection] so an empty or
+     * not-yet-created directory is tolerated.
+     */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val resolvedArtifactsDir: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val resolvedCheckoutsDir: ConfigurableFileCollection
 
     @get:OutputDirectories
     abstract val generatedDirs: ListProperty<File>

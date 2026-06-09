@@ -8,6 +8,7 @@ import io.github.frankois944.spmForKmp.TASK_GENERATE_CINTEROP_DEF
 import io.github.frankois944.spmForKmp.TASK_GENERATE_EXPORTABLE_PACKAGE
 import io.github.frankois944.spmForKmp.TASK_GENERATE_MANIFEST
 import io.github.frankois944.spmForKmp.TASK_GENERATE_REGISTRY_FILE
+import io.github.frankois944.spmForKmp.TASK_RESOLVE_PACKAGE
 import io.github.frankois944.spmForKmp.config.AppleCompileTarget
 import io.github.frankois944.spmForKmp.config.NewPublicationInteroperabilityFeature
 import io.github.frankois944.spmForKmp.config.PackageDirectoriesConfig
@@ -25,6 +26,8 @@ import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.Ge
 import io.github.frankois944.spmForKmp.tasks.apple.generateExportableManifest.configureTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.GenerateManifestTask
 import io.github.frankois944.spmForKmp.tasks.apple.generateManifest.configureTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.ResolveSwiftPackageTask
+import io.github.frankois944.spmForKmp.tasks.apple.resolveSwiftPackage.configureTask
 import io.github.frankois944.spmForKmp.tasks.utils.getBuildMode
 import io.github.frankois944.spmForKmp.tasks.utils.getCInteropTaskName
 import io.github.frankois944.spmForKmp.tasks.utils.getTargetBuildDirectory
@@ -97,6 +100,24 @@ internal fun Project.configAppleTargets(
                 packageDirectoriesConfig = packageDirectoriesConfig,
             )
         }
+
+    // Resolve the package dependency graph exactly ONCE per package (not per target).
+    // This task owns the shared SwiftPM resolution outputs (artifacts/, checkouts/, repositories/)
+    // so they are produced before any target builds and are tracked by Gradle, instead of being an
+    // untracked side effect of whichever target compiled first.
+    val resolvePackageTask: TaskProvider<ResolveSwiftPackageTask> =
+        tasks.register(
+            getTaskName(TASK_RESOLVE_PACKAGE, swiftPackageEntry.internalName),
+            ResolveSwiftPackageTask::class.java,
+        ) {
+            it.configureTask(
+                swiftPackageEntry = swiftPackageEntry,
+                packageDirectoriesConfig = packageDirectoriesConfig,
+            )
+        }
+    resolvePackageTask.configure {
+        it.dependsOn(packageRegistryTask)
+    }
 
     val buildMode = getBuildMode(swiftPackageEntry)
     allTargets.forEachIndexed { index, cinteropTarget ->
@@ -209,7 +230,7 @@ internal fun Project.configAppleTargets(
             it.dependsOn(manifestTask)
         }
         compileTask.configure {
-            it.dependsOn(packageRegistryTask)
+            it.dependsOn(resolvePackageTask)
         }
         copyPackageResourcesTask.configure {
             it.dependsOn(compileTask)

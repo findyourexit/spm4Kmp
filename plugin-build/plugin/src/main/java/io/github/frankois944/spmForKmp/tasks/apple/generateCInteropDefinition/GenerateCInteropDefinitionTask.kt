@@ -17,6 +17,7 @@ import io.github.frankois944.spmForKmp.utils.checkSum
 import io.github.frankois944.spmForKmp.utils.findFilesRecursively
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -24,6 +25,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
@@ -73,6 +75,19 @@ internal abstract class GenerateCInteropDefinitionTask : DefaultTask() {
 
     @get:Input
     abstract val scratchDir: Property<String>
+
+    /**
+     * The shared SwiftPM resolution outputs (extracted binary `xcframework` artifacts and source
+     * checkouts) read while generating the cinterop definition. Declared as tracked inputs so this
+     * task is sound under the build cache instead of silently reading an untracked directory.
+     */
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val resolvedArtifactsDir: ConfigurableFileCollection
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val resolvedCheckoutsDir: ConfigurableFileCollection
 
     @get:Input
     @get:Optional

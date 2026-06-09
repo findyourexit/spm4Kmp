@@ -21,6 +21,8 @@ internal fun CompileSwiftPackageTask.configureTask(
     this.packageSwift.set(packageDirectoriesConfig.spmWorkingDir.resolve(SWIFT_PACKAGE_NAME))
     this.workingDir.set(packageDirectoriesConfig.spmWorkingDir.absolutePath)
     this.packageScratchDir.set(packageDirectoriesConfig.packageScratchDir.absolutePath)
+    this.resolvedArtifactsDir.from(packageDirectoriesConfig.packageScratchDir.resolve("artifacts"))
+    this.resolvedCheckoutsDir.from(packageDirectoriesConfig.packageScratchDir.resolve("checkouts"))
     this.bridgeSourceDir.set(packageDirectoriesConfig.bridgeSourceDir)
     this.osVersion.set(computeOsVersion(cinteropTarget, swiftPackageEntry))
     this.sharedCacheDir.set(packageDirectoriesConfig.sharedCacheDir?.absolutePath)
