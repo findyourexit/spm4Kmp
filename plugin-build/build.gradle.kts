@@ -31,7 +31,7 @@ allprojects {
     ktlint {
         android.set(false)
         outputToConsole.set(false)
-        ignoreFailures.set(true)
+        ignoreFailures.set(false)
         enableExperimentalRules.set(true)
         reporters {
             reporter(ReporterType.JSON)
