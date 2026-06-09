@@ -32,7 +32,6 @@ import io.github.frankois944.spmForKmp.tasks.utils.getTaskName
 import io.github.frankois944.spmForKmp.utils.ExperimentalSpmForKmpFeature
 import io.github.frankois944.spmForKmp.utils.compareVersions
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -46,10 +45,10 @@ import java.io.File
 
 @Suppress("LongMethod", "LongParameterList")
 internal fun Project.configAppleTargets(
-    taskGroup: MutableMap<AppleCompileTarget, Task>,
+    taskGroup: MutableMap<AppleCompileTarget, TaskProvider<*>>,
     cInteropTaskNamesWithDefFile: MutableMap<String, File>,
-    cInteropTaskNamesWithProducerTask: MutableMap<String, Task>,
-    cInteropTaskNamesWithExportTask: MutableMap<String, Task>,
+    cInteropTaskNamesWithProducerTask: MutableMap<String, TaskProvider<*>>,
+    cInteropTaskNamesWithExportTask: MutableMap<String, TaskProvider<*>>,
     swiftPackageEntry: PackageRootDefinitionExtension,
     packageDirectoriesConfig: PackageDirectoriesConfig,
 ) {
@@ -199,8 +198,8 @@ internal fun Project.configAppleTargets(
                 }
                 val cinteropTaskName = getCInteropTaskName(cinteropName, cinteropTarget)
                 cInteropTaskNamesWithDefFile[cinteropTaskName] = file
-                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask.get()
-                cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask.get()
+                cInteropTaskNamesWithProducerTask[cinteropTaskName] = definitionTask
+                cInteropTaskNamesWithExportTask[cinteropTaskName] = exportedManifestTask
             }
         }
 
@@ -219,7 +218,7 @@ internal fun Project.configAppleTargets(
         }
 
         // Keep a handle to the "root" for this target
-        taskGroup[cinteropTarget] = definitionTask.get()
+        taskGroup[cinteropTarget] = definitionTask
     }
 }
 
